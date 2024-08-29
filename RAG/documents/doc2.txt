@@ -1,0 +1,1 @@
+FAISS is a library for efficient similarity search and clustering of dense vectors. It is widely used in conjunction with language models for retrieval tasks.
