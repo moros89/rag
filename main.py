@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from rag import read_json_config, load_and_split_documents, create_vector_store, setup_rag_chain, ask_question
 import uvicorn
+import os
 
 app = FastAPI()
 
@@ -24,11 +25,10 @@ class Public:
 
 public = Public()
 
-@app.get("/query/")
+@app.post("/query/")
 async def query(request: Request):
     response = ask_question(public.chain, request.question)
-
-    return {"response": response.result}
+    return {"response": response['result']}
 
 if __name__ == "__main__":
     host = os.getenv("HOST", "0.0.0.0")
