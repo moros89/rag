@@ -4,6 +4,7 @@ from langchain.chains import RetrievalQA
 from langchain_openai import ChatOpenAI
 from langchain_community.document_loaders import TextLoader
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+import json
 
 def read_json_config(filename):
     with open(filename, 'r') as f:
@@ -47,5 +48,5 @@ def setup_rag_chain(config, vector_store):
 
 # Step 4: 使用 RAG 进行问答
 def ask_question(chain, question):
-    response = chain.run(question)
+    response = chain.invoke(question)
     return response
