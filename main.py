@@ -71,4 +71,4 @@ async def load_root(request: Request):
 if __name__ == "__main__":
     host = os.getenv("HOST", "0.0.0.0")
     port = int(os.getenv("PORT", 80))
-    uvicorn.run(app, host=host, port=port, reload=True)
+    uvicorn.run(app, host=host, port=port)
