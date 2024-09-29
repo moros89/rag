@@ -38,12 +38,12 @@ class Public:
 
 public = Public()
 
-@app.post("/query/")
+@app.post("/query")
 async def query(request: Request):
     response = ask_question(public.chain, request.question)
     return {"response": response['result']}
 
-@app.post("/query_endpoint/", response_class=HTMLResponse)
+@app.post("/query_endpoint", response_class=HTMLResponse)
 async def query_endpoint(question: str = Form(...)):
     response = ask_question(public.database_chain, question)
     query = response['query']
@@ -52,11 +52,11 @@ async def query_endpoint(question: str = Form(...)):
     # Use the template to render the response
     return template.TemplateResponse("result.html", {"request": {}, "query": query, "rresult": result})
 
-@app.get("/question", response_class=HTMLResponse)
-async def load_root(request: Request):
+@app.post("/question", response_class=HTMLResponse)
+async def load_question_page(request: Request):
     return template.TemplateResponse("question.html", {"request": request})
 
-@app.post("/login/", response_class=HTMLResponse)
+@app.post("/login", response_class=HTMLResponse)
 async def login(username: str = Form(...)):
     res = query_users(username)
     if res == 200:
