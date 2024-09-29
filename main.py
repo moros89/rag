@@ -6,6 +6,7 @@ from langchain.schema import Document
 from rag import load_and_split_documents, create_vector_store, setup_rag_chain, ask_question
 from rag_mysql import insert_documents_and_vectors, CustomRetriever, setup_database_rag_chain
 from load_config import public_config
+from db_connection import query_users
 import uvicorn
 import os
 
