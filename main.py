@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.templating import Jinja2Templates
 from pydantic import BaseModel
 from langchain.schema import Document
 from rag import load_and_split_documents, create_vector_store, setup_rag_chain, ask_question
