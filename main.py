@@ -1,10 +1,10 @@
-from fastapi import FastAPI, Form
+from fastapi import FastAPI, Form, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 from pydantic import BaseModel
 from langchain.schema import Document
 from rag import load_and_split_documents, create_vector_store, setup_rag_chain, ask_question
 from rag_mysql import insert_documents_and_vectors, CustomRetriever, setup_database_rag_chain
-from load_config import read_json_config
+from load_config import public_config
 import uvicorn
 import os
 
@@ -16,7 +16,7 @@ class Request(BaseModel):
 class Public:
     def __init__(self) -> None:
         # step 1: load config
-        config = read_json_config("./documents/config.json")
+        # config = read_json_config("./documents/config.json")
 
         # step 2: load documents and pre operations
         # self.docs = load_and_split_documents()
@@ -34,7 +34,7 @@ class Public:
         self.retriever = CustomRetriever()
 
         # step 7: create database chain
-        self.database_chain = setup_database_rag_chain(config, self.retriever)
+        self.database_chain = setup_database_rag_chain(public_config, self.retriever)
 
 public = Public()
 
@@ -48,41 +48,27 @@ async def query_endpoint(question: str = Form(...)):
     response = ask_question(public.database_chain, question)
     query = response['query']
     result = response['result']
-    html_content = """
-    <html>
-        <head>
-            <title>Answer your question</title>
-        </head>
-        <body>
-            <h1>Answer your question</h1>
-            <p>Your question: {query} </p>
-            <p>Answer: {rresult} </p>
-        </body>
-    </html>
-    """
 
-    return HTMLResponse(content=html_content.format(query=query, rresult=result), status_code=200)
+    # Use the template to render the response
+    return template.TemplateResponse("result.html", {"request": {}, "query": query, "rresult": result})
+
+@app.get("/question", response_class=HTMLResponse)
+async def load_root(request: Request):
+    return template.TemplateResponse("question.html", {"request": request})
+
+@app.post("/login/", response_class=HTMLResponse)
+async def login(username: str = Form(...)):
+    res = query_users(username)
+    if res == 200:
+        return template.TemplateResponse("question.html", {"request": {}})
+    else:
+        return template.TemplateResponse("notfound.html", {"request": {}})
 
 @app.get("/", response_class=HTMLResponse)
-async def index():
-    html_content = """
-    <html>
-        <head>
-            <title>Ask your question</title>
-        </head>
-        <body>
-            <h1>Ask your question</h1>
-            <form action="/query_endpoint/" method="post">
-                <label for="question">Question:</label>
-                <input type="text" id="question" name="question">
-                <button type="submit">Submit</button>
-            </form>
-        </body>
-    </html>
-    """
-    return HTMLResponse(content=html_content, status_code=200)
+async def load_root(request: Request):
+    return template.TemplateResponse("login.html", {"request": request})
 
 if __name__ == "__main__":
     host = os.getenv("HOST", "0.0.0.0")
-    port = int(os.getenv("PORT", 8000))
+    port = int(os.getenv("PORT", 80))
     uvicorn.run(app, host=host, port=port, reload=True)
