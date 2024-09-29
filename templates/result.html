@@ -70,7 +70,9 @@
             <p><strong>Answer:</strong> {{ rresult }} </p>
         </div>
         <div class="button-container">
-            <button onclick="window.location.href='/question'">Ask Another Question</button>
+            <form action="/question" method="post">
+                <button type="submit">Ask Another Question</button>
+            </form>
         </div>
     </div>
 </body>
