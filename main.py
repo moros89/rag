@@ -10,6 +10,8 @@ import os
 
 app = FastAPI()
 
+template = Jinja2Templates(directory="templates")
+
 class Request(BaseModel):
     question: str
 
